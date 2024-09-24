@@ -1,0 +1,195 @@
+---
+title: "Fuel Watch"
+author: "Leona Hoxha"
+format: html
+editor: visual
+html:
+standalone: true
+code-fold: true
+embed-resources: true
+---
+
+```{r, message="hide"}
+#| message: false
+library(tidyverse)
+library(purrr)
+library(patchwork)
+library(dplyr)
+library(ggplot2)
+```
+
+
+# 3.Visual Data Exploration
+
+
+```{r}
+fuelwatch <- read.csv("FuelWatch.csv")
+fuelw <- filter(fuelwatch, PRODUCT_DESCRIPTION=="ULP")
+
+```
+
+
+## i.Brands
+
+### a.
+
+The bar chart shows the number of data point of each of the brands and orders them from the one which has the most data points to the one who has the least in the "fuelw" data frame.
+
+
+```{r}
+
+fuelwatch |>
+  ggplot(aes(y=fct_rev(fct_infreq(BRAND_DESCRIPTION))))+
+  geom_bar( fill="#C372DC")+
+  labs(x = "Count of the data points",
+         y = "The label of the brand",
+         title = "The number of data points for all brands")+
+  theme_minimal()
+```
+
+
+What we can see from this chart is that the top 3 brands which have the largest number of data points are BP, Ampol and also Coles Express. Whereas the brands that have the least data points are BOC, Caltex Woolworths, OTR.
+
+### b.
+
+The line chart shows how the average price of each brand changed over time. Each line shows the mean price of a brand and to distinguish them they are all different colors.
+
+
+```{r, fig.width=10, fig.height=5}
+#| message: false
+fuelw |>
+  filter(!is.na(PRODUCT_PRICE)) |>
+  mutate(month = format(as.Date(PUBLISH_DATE,"%d/%m/%Y"), "%Y-%m"))|>
+  group_by(BRAND_DESCRIPTION, month) |>
+  summarize(pmean = mean(PRODUCT_PRICE)) |>
+  ggplot(aes(x = month, y =pmean, color=BRAND_DESCRIPTION)) +
+  geom_line(aes(group=BRAND_DESCRIPTION))+
+  labs(x = "",
+       y = "The average price",
+       title = "The mean price by brands through time",
+       color="Label of the Brand")+
+  theme_minimal()
+
+```
+
+
+From this graphic we can see that for every brand the average price has had the same changing pattern. The biggest changes in prices happened during the November to December 2022 and July to September 2023. Also the average price had a slight immediate change in April 2023.
+
+## ii.Regions
+
+### a.
+
+The bar chart shows the number of data point of each of the regions and orders them from the one which has the most data points to the one who has the least in the "fuelw" data frame.
+
+
+```{r}
+fuelw |>
+  ggplot(aes(y=fct_rev(fct_infreq(REGION_DESCRIPTION))))+
+  geom_bar(fill="#C372DC")+
+  labs(x="Count of data points",
+       y="The name of the region",
+       title = "The number of data points for all the regions")+
+  theme_minimal()
+```
+
+
+What we can see from this chart is that the top 3 regions which have the largest number of data points are Metro, South-West and also Peel. Whereas the regions that have the least data points are Pilbara, Kimberley, and Gascoyne..
+
+### b.
+
+The line chart shows how the average price of each region changed over time. Each line shows the mean price of a region and to distinguish them they are all different colors.
+
+
+```{r, fig.width=10, fig.height=5}
+#| message: false
+fuelw |>
+  filter(!is.na(PRODUCT_PRICE)) |>
+  mutate(month = format(as.Date(PUBLISH_DATE,"%d/%m/%Y"), "%Y-%m"))|>
+  group_by(REGION_DESCRIPTION, month) |>
+  summarize(pmean = mean(PRODUCT_PRICE)) |>
+  ggplot(aes(x = month, y =pmean, color=REGION_DESCRIPTION)) +
+  geom_line(aes(group=REGION_DESCRIPTION))+
+  labs(x = "",
+       y = "The average price",
+       title = "The mean price by region through time",
+       color="Name of region")+
+  theme_minimal()
+```
+
+
+From this graphic we can see that for every region the average price has had almost the same changing pattern. The biggest changes in prices happened during the November to December 2022 and July to September 2023. Also the average price had a slight immediate change in April 2023. We can see that the Gascoyne has the highest average price and has quite a difference compared to the other regions.
+
+## iii.Areas in the region "Peel"
+
+### a.
+
+The bar chart shows the number of data points of each of the areas in the Peel region and orders them from the one which has the most data points to the one who has the least in the "fuelw" data frame.
+
+
+```{r}
+fuelw |>
+  filter(REGION_DESCRIPTION=="Peel") |>
+  ggplot(aes(y=fct_rev(fct_infreq(AREA_DESCRIPTION))))+
+  geom_bar(fill="#C372DC")+
+  labs(x="Count of data points",
+       y="The name of the area",
+       title = "The number of data points for all the areas in Peel region")+
+  theme_minimal()
+```
+
+
+What we can see from this chart is that the area Mandurah has the most data points for more than 6 thousand. Whereas the area of Waroona has the least, with a little bit more than 1 thousand.
+
+### b.
+
+The line chart shows how the average price of each area of the Peel region changed over time. Each line shows the mean price of the areas in Peel and to distinguish them they are all different colors.
+
+
+```{r, fig.width=10, fig.height=5}
+#| message: false
+fuelw |>
+  filter(REGION_DESCRIPTION=="Peel") |>
+  filter(!is.na(PRODUCT_PRICE)) |>
+  mutate(month = format(as.Date(PUBLISH_DATE,"%d/%m/%Y"), "%Y-%m"))|>
+  group_by(AREA_DESCRIPTION, month) |>
+  summarize(pmean = mean(PRODUCT_PRICE)) |>
+  ggplot(aes(x = month, y =pmean, color=AREA_DESCRIPTION)) +
+  geom_line(aes(group=AREA_DESCRIPTION))+
+  labs(x = "",
+       y = "The average price",
+       title = "The mean price by areas in Peel region through time",
+       color="Name of area")+
+  theme_minimal()
+```
+
+
+From this graphic we can see that for each of the three ares in the Peel region the average price has had almost the same changing pattern. The biggest changes in prices happened during the November to December 2022 and July to September 2023. Also the average price had a slight immediate change in April 2023. Moreover, the area of Mandurah has had the biggest average price out of the three areas.
+
+## iv.
+
+In this graphic we are going to analyse the how the average prices have changed in the petrol stations in the area of Murray in the Peel region through time.
+
+
+```{r, fig.width=10, fig.height=5}
+#| message: false
+fuelw |>
+  filter(REGION_DESCRIPTION=="Peel" & AREA_DESCRIPTION=="Murray" & !is.na(PRODUCT_PRICE)) |>
+  mutate(month = format(as.Date(PUBLISH_DATE,"%d/%m/%Y"), "%Y-%m"))|>
+  group_by(TRADING_NAME, month) |>
+  summarize(pmean = mean(PRODUCT_PRICE)) |>
+  ggplot(aes(x = month, y =pmean, color=TRADING_NAME)) +
+  geom_line(aes(group=TRADING_NAME))+
+  labs(x = "",
+       y = "The average price",
+       title = "The mean price by petrol stations for Murray area in Peel region through time",
+       color="Name of petrol station")+
+  theme_minimal()
+```
+
+
+From this graphic we can see that for each of the petrol stations in Murray, Peel, the average price has had almost the same changing pattern except for the Canal Shop petrol station. For the Canal shop petrol station prices have been fixed for the last 12 months, being at the value of 199. The biggest changes in prices happened during the November to December 2022 and July to September 2023. Furthermore, we can a see a clear decrease in the average price from September 2023 for almost all the petrol stations. Also the average price had a slight immediate change in April 2023.
+
+# 4. Different patterns of price dynamics
+
+For all the graphics that show the average price through time, we can see three different changing patters. The first one is during the time of November to December 2022 where we can see quite a decrease of the prices. During april of 2023, there is a sudden increase which continues with a decrease of prices for all graphics therefore that is the second changing pattern. And lastly we can see that during july 2023 there is a big increase of prices, where in september 2023 is the peak of the highest price for the last 12 months.
+
